@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Tabulator";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div id="example-table"></div>
+
+@section Scripts {
+    <script>
+        var table; // Tabloyu dışarıda tanımlıyoruz
+        var isSmallScreen = window.innerWidth <= 800;
+
+        function initializeTable() {
+            if (table) {
+                table.destroy(); // Var olan tabloyu yok et
+            }
+
+            if (isSmallScreen) {
+                // 800px'den küçükse özel format
+                table = new Tabulator("#example-table", {
+                    data: tableData, // Tablo verisi
+                    layout: "fitColumns", // Tablonun sığması için sütunları otomatik olarak ayarla
+                    headerVisible: false, // Başlık satırını gizle
+                    columns: [
+                        {
+                            field: "details", formatter: function (cell, formatterParams, onRendered) {
+                                var data = cell.getData();
+                                return `
+                                                    <div>
+                                                        <strong>ID:</strong> ${data.id} <br>
+                                                        <strong>Name:</strong> ${data.name} <br>
+                                                        <strong>Age:</strong> ${data.age} <br>
+
+                                                    </div>
+                                                `;
+                            }
+                        }
+                    ]
+                });
+            } else {
+                // 800px'den büyükse normal tablo yapısı
+                table = new Tabulator("#example-table", {
+                    data: tableData, // Tablo verisi
+                    layout: "fitColumns", // Tablonun sığması için sütunları otomatik olarak ayarla
+                    headerVisible: true, // Başlık satırını gizle
+                    columns: [
+                        { title: "ID", field: "id", width: 50 },
+                        { title: "Name", field: "name" },
+                        { title: "Age", field: "age" }
+                    ]
+                });
+            }
+        }
+
+        // Mock data oluşturun
+        var tableData = [
+            { id: 1, name: "John", age: 23 },
+            { id: 2, name: "Jane", age: 34 },
+            { id: 3, name: "Steve", age: 45 }
+        ];
+
+        // İlk tabloyu başlat
+        initializeTable();
+
+        // Pencere boyutu değiştiğinde tabloyu yeniden oluştur
+        window.addEventListener('resize', function () {
+            var currentIsSmallScreen = window.innerWidth <= 800;
+
+            if (currentIsSmallScreen !== isSmallScreen) {
+                isSmallScreen = currentIsSmallScreen;
+                initializeTable(); // Yalnızca 800px sınırında yeniden oluştur
+            }
+        });
+    </script>
+}
